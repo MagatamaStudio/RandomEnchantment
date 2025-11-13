@@ -1,0 +1,157 @@
+# RandomEnchantment 插件配置文件
+# 在此配置文件中设置各种工具和装备可被附魔的属性与附魔数量
+
+# 附魔数量设置 (每个物品可以获得的附魔数量范围)
+enchantment-count:
+  default: 1-3  # 默认的附魔数量范围
+  swords: 1-4   # 剑类武器可以获得更多附魔
+  armor: 2-4    # 防具类可以获得更多附魔
+  tools: 1-3    # 工具类 (镐、铲、斧等)
+  fishing_rod: 1-2  # 钓鱼竿
+  bow: 1-3      # 弓
+  crossbow: 1-3 # 弩
+
+# 各类型物品可获得的附魔列表
+# 格式: 物品类型: [附魔类型1, 附魔类型2, ...]
+# 物品类型参考: SWORD, AXE, PICKAXE, SHOVEL, HOE, HELMET, CHESTPLATE, LEGGINGS, BOOTS, BOW, CROSSBOW, FISHING_ROD, TRIDENT
+
+# 剑类附魔
+sword-enchantments:
+  - DAMAGE_ALL     # 锋利
+  - DAMAGE_UNDEAD  # 亡灵杀手
+  - DAMAGE_ARTHROPODS  # 节肢杀手
+  - KNOCKBACK      # 击退
+  - FIRE_ASPECT    # 火焰附加
+  - LOOT_BONUS_MOBS  # 抢夺
+  - SWEEPING_EDGE  # 横扫之刃
+  - MENDING        # 经验修补
+  - UNBREAKING     # 耐久
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 镐类附魔
+pickaxe-enchantments:
+  - DIG_SPEED      # 效率
+  - SILK_TOUCH     # 精准采集
+  - DURABILITY     # 耐久 (注意这里是DURABILITY，不是UNBREAKING)
+  - LOOT_BONUS_BLOCKS  # 时运
+  - MENDING        # 经验修补
+  - CURSE_OF_VANISHING  # 消失诅咒
+  - EFFICIENCY     # 效率 (某些版本使用EFFICIENCY而不是DIG_SPEED)
+  - UNBREAKING     # 耐久 (某些版本使用UNBREAKING而不是DURABILITY)
+
+# 斧类附魔
+axe-enchantments:
+  - DIG_SPEED      # 效率
+  - SILK_TOUCH     # 精准采集
+  - DURABILITY     # 耐久
+  - LOOT_BONUS_BLOCKS  # 时运
+  - MENDING        # 经验修补
+  - UNBREAKING     # 耐久
+  - EFFICIENCY     # 效率
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 铲类附魔
+shovel-enchantments:
+  - DIG_SPEED      # 效率
+  - SILK_TOUCH     # 精准采集
+  - DURABILITY     # 耐久
+  - LOOT_BONUS_BLOCKS  # 时运
+  - MENDING        # 经验修补
+  - UNBREAKING     # 耐久
+  - EFFICIENCY     # 效率
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 头盔附魔
+helmet-enchantments:
+  - PROTECTION_ENVIRONMENTAL  # 保护
+  - PROTECTION_FIRE      # 火焰保护
+  - PROTECTION_FALL      # 摔落保护
+  - PROTECTION_PROJECTILE  # 弹射物保护
+  - PROTECTION_EXPLOSIONS  # 爆炸保护
+  - OXYGEN        # 水下呼吸
+  - WATER_WORKER  # 水下速掘
+  - THORNS        # 荆棘
+  - MENDING       # 经验修补
+  - UNBREAKING    # 耐久
+  - CURSE_OF_BINDING  # 绑定诅咒
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 胸甲附魔
+chestplate-enchantments:
+  - PROTECTION_ENVIRONMENTAL  # 保护
+  - PROTECTION_FIRE      # 火焰保护
+  - PROTECTION_FALL      # 摔落保护
+  - PROTECTION_PROJECTILE  # 弹射物保护
+  - PROTECTION_EXPLOSIONS  # 爆炸保护
+  - THORNS        # 荆棘
+  - MENDING       # 经验修补
+  - UNBREAKING    # 耐久
+  - CURSE_OF_BINDING  # 绑定诅咒
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 护腿附魔
+leggings-enchantments:
+  - PROTECTION_ENVIRONMENTAL  # 保护
+  - PROTECTION_FIRE      # 火焰保护
+  - PROTECTION_FALL      # 摔落保护
+  - PROTECTION_PROJECTILE  # 弹射物保护
+  - PROTECTION_EXPLOSIONS  # 爆炸保护
+  - THORNS        # 荆棘
+  - MENDING       # 经验修补
+  - UNBREAKING    # 耐久
+  - CURSE_OF_BINDING  # 绑定诅咒
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 靴子附魔
+boots-enchantments:
+  - PROTECTION_ENVIRONMENTAL  # 保护
+  - PROTECTION_FIRE      # 火焰保护
+  - PROTECTION_FALL      # 摔落保护
+  - PROTECTION_PROJECTILE  # 弹射物保护
+  - PROTECTION_EXPLOSIONS  # 爆炸保护
+  - DEPTH_STRIDER  # 深海探索者
+  - FROST_WALKER   # 冰霜行者
+  - THORNS        # 荆棘
+  - MENDING       # 经验修补
+  - UNBREAKING    # 耐久
+  - CURSE_OF_BINDING  # 绑定诅咒
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 弓附魔
+bow-enchantments:
+  - ARROW_DAMAGE  # 力量
+  - ARROW_KNOCKBACK  # 冲击
+  - ARROW_FIRE    # 火矢
+  - ARROW_INFINITE  # 无限
+  - MENDING       # 经验修补
+  - UNBREAKING    # 耐久
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 弩附魔
+crossbow-enchantments:
+  - QUICK_CHARGE   # 快速装填
+  - MULTISHOT      # 穿透
+  - PIERCING       # 穿透
+  - MENDING        # 经验修补
+  - UNBREAKING     # 耐久
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 钓鱼竿附魔
+fishing-rod-enchantments:
+  - LURE          # 诱饵
+  - LUCK_OF_THE_SEA  # 海之眷顾
+  - MENDING       # 经验修补
+  - UNBREAKING    # 耐久
+  - CURSE_OF_VANISHING  # 消失诅咒
+
+# 是否允许重复附魔 (同一物品上出现相同类型的附魔)
+allow-duplicate-enchantments: false
+
+# 是否强制使用本插件的附魔机制，替代原版附魔机制
+force-random-enchantment: true
+
+# 是否允许为所有物品附魔 (包括原版不可附魔的物品)
+allow-all-items-enchantment: false
+
+# 调试模式 (启用后会在控制台输出更多信息)
+debug-mode: false

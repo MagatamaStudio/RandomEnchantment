@@ -1,0 +1,11 @@
+name: RandomEnchantment
+main: KujouShiori.github.RandomEnchantment
+version: 1.0.0
+api-version: 1.20
+author: KujouShiori
+description: 随机附魔插件，允许玩家使用附魔台时获得随机属性
+commands:
+  randomenchant:
+    description: 随机附魔插件的主命令
+    usage: /<command> reload
+    aliases: [renchant, ranenchant]

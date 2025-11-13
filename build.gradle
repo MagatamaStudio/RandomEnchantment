@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        url 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    // 使用Paper API作为Minecraft服务器依赖
+    compileOnly 'io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT'
+}
+
+group = 'me.github.randomenchantment'
+version = '1.0.0'
+
+java {
+    withSourcesJar()
+    // 在java块内设置兼容性版本
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.compileJava {
+    options.encoding = 'UTF-8'
+}
+
+// Gradle 9.x 兼容的方式设置jar任务
+jar {
+    // 设置jar文件名
+    archiveBaseName.set('RandomEnchantment')
+    archiveVersion.set('1.0.0')
+}
+
+// 复制资源文件到jar中
+processResources {
+    filteringCharset 'UTF-8'
+    from('src/main/resources') {
+        include 'plugin.yml'
+        include 'config.yml'
+    }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+// 清理旧的构建文件
+clean {
+    delete rootProject.buildDir
+    delete "${rootProject.projectDir}/target"
+}
