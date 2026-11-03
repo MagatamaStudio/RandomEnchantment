@@ -47,6 +47,11 @@ jobs:
           name: RandomEnchantment-jar
           path: dist
 
+      # maven-shade-plugin 会额外产出 original-*.jar（重打包前的原始包），
+      # 发布时只保留最终插件 jar
+      - name: Drop shaded original jar
+        run: rm -f dist/original-*.jar
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
