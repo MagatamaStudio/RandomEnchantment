@@ -150,17 +150,18 @@ public class ConfigManager {
      * 加载物品类型与附魔映射
      */
     private void loadItemEnchantmentsMap() {
-        // 预定义的物品类型列表
-        String[] itemTypes = {
-            "sword", "pickaxe", "axe", "shovel", "tool", 
-            "helmet", "chestplate", "leggings", "boots",
-            "bow", "crossbow", "fishing_rod"
-        };
-        
-        for (String itemType : itemTypes) {
-            String configPath = itemType + "-enchantments";
-            if (config.isList(configPath)) {
-                List<String> enchantments = config.getStringList(configPath);
+        // 不再硬编码物品类型列表：遍历所有以 -enchantments 结尾的键，
+        // 这样 config.yml 里的 fishing-rod-enchantments（连字符）也能被正确读取
+        for (String key : config.getKeys(false)) {
+            if (key == null || !key.endsWith("-enchantments")) {
+                continue;
+            }
+            String itemType = normalizeItemType(key.substring(0, key.length() - "-enchantments".length()));
+            if (itemType == null || itemType.isEmpty()) {
+                continue;
+            }
+            if (config.isList(key)) {
+                List<String> enchantments = config.getStringList(key);
                 if (!enchantments.isEmpty()) {
                     itemEnchantmentsMap.put(itemType, new ArrayList<>(enchantments));
                     if (debugMode) {
@@ -174,6 +175,16 @@ public class ConfigManager {
         if (itemEnchantmentsMap.isEmpty()) {
             logger.warning("未找到任何物品类型的附魔配置！请检查配置文件。");
         }
+    }
+    
+    /**
+     * 统一物品类型键名：去掉首尾空白、转小写、把连字符换成下划线
+     */
+    private static String normalizeItemType(String itemType) {
+        if (itemType == null) {
+            return null;
+        }
+        return itemType.trim().toLowerCase(Locale.ROOT).replace('-', '_');
     }
     
     /**
@@ -195,6 +206,11 @@ public class ConfigManager {
         for (Map.Entry<String, List<String>> entry : itemEnchantmentsMap.entrySet()) {
             String itemType = entry.getKey();
             for (String enchantName : entry.getValue()) {
+                // 先做旧版附魔 ID → 现代 key 的映射，避免误报"未知的附魔类型"
+                enchantName = EnchantmentManager.legacyToKey(enchantName);
+                if (enchantName == null) {
+                    continue;
+                }
                 Enchantment enchantment = Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(enchantName.toLowerCase()));
                 if (enchantment == null) {
                     // 尝试通过其他方式查找
@@ -225,16 +241,55 @@ public class ConfigManager {
     public EnchantmentRange getEnchantmentRange(String itemType) {
         EnchantmentRange range = enchantmentRanges.get(itemType);
         if (range == null) {
+            // config.yml 的 enchantment-count 使用分组键名（swords/armor/tools），做别名回退
+            for (String alias : getRangeAliases(itemType)) {
+                range = enchantmentRanges.get(alias);
+                if (range != null) {
+                    break;
+                }
+            }
+        }
+        if (range == null) {
             return enchantmentRanges.get("default");
         }
         return range;
     }
     
     /**
+     * 单个物品类型对应的分组键名别名
+     */
+    private static List<String> getRangeAliases(String itemType) {
+        List<String> aliases = new ArrayList<>();
+        if (itemType == null) {
+            return aliases;
+        }
+        switch (itemType) {
+            case "sword":
+                aliases.add("swords");
+                break;
+            case "pickaxe":
+            case "axe":
+            case "shovel":
+            case "tool":
+                aliases.add("tools");
+                break;
+            case "helmet":
+            case "chestplate":
+            case "leggings":
+            case "boots":
+                aliases.add("armor");
+                break;
+            default:
+                break;
+        }
+        return aliases;
+    }
+    
+    /**
      * 获取指定物品类型的可用附魔列表
      */
     public List<String> getEnchantmentsForItemType(String itemType) {
-        List<String> enchantments = itemEnchantmentsMap.get(itemType);
+        List<String> enchantments = itemEnchantmentsMap.get(normalizeItemType(itemType));
         if (enchantments == null) {
             return new ArrayList<>();
         }
@@ -245,7 +300,7 @@ public class ConfigManager {
      * 检查配置中是否包含指定的物品类型
      */
     public boolean hasItemType(String itemType) {
-        return itemEnchantmentsMap.containsKey(itemType);
+        return itemEnchantmentsMap.containsKey(normalizeItemType(itemType));
     }
     
     // Getters

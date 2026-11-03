@@ -86,14 +86,10 @@ public final class RandomEnchantment extends JavaPlugin implements Listener, org
         // 创建物品的副本以避免修改原版物品
         ItemStack item = originalItem.clone();
         
-        // 检查物品是否可以附魔
-        // 使用配置直接控制是否允许为所有物品附魔
-        if (!configManager.isAllowAllItemsEnchantment()) {
-            debug("物品 " + item.getType() + " 不可附魔，且不允许为所有物品附魔");
-            player.sendMessage("§c该物品不可附魔！");
-            return;
-        }
-        
+        // 物品兼容性交给 EnchantmentManager 内部判断，
+        // 这里不再按 allow-all-items-enchantment 直接拒绝所有物品，
+        // 以免默认配置（false）下附魔台永远不给任何附魔。
+
         // 应用随机附魔
         boolean success = enchantmentManager.applyRandomEnchantments(item);
         
@@ -117,6 +113,8 @@ public final class RandomEnchantment extends JavaPlugin implements Listener, org
         } else {
             // 记录失败原因
             debug("为物品 " + item.getType() + " 应用随机附魔失败");
+            // 撤销取消，让原版附魔继续，避免"取消原版又什么都不给"
+            event.setCancelled(false);
             player.sendMessage("§c无法应用随机附魔到该物品。可能该物品已拥有所有可用的附魔。");
         }
     }

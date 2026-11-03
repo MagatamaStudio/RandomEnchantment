@@ -10,6 +10,59 @@ import java.util.logging.Logger;
 
 public class EnchantmentManager {
     
+    // 旧版（1.13 之前）附魔 ID → 现代附魔 key 的映射
+    private static final Map<String, String> LEGACY = new HashMap<>();
+    
+    static {
+        LEGACY.put("DAMAGE_ALL", "sharpness");
+        LEGACY.put("DAMAGE_UNDEAD", "smite");
+        LEGACY.put("DAMAGE_ARTHROPODS", "bane_of_arthropods");
+        LEGACY.put("KNOCKBACK", "knockback");
+        LEGACY.put("FIRE_ASPECT", "fire_aspect");
+        LEGACY.put("LOOT_BONUS_MOBS", "looting");
+        LEGACY.put("SWEEPING_EDGE", "sweeping_edge");
+        LEGACY.put("DIG_SPEED", "efficiency");
+        LEGACY.put("EFFICIENCY", "efficiency");
+        LEGACY.put("SILK_TOUCH", "silk_touch");
+        LEGACY.put("DURABILITY", "unbreaking");
+        LEGACY.put("UNBREAKING", "unbreaking");
+        LEGACY.put("LOOT_BONUS_BLOCKS", "fortune");
+        LEGACY.put("PROTECTION_ENVIRONMENTAL", "protection");
+        LEGACY.put("PROTECTION_FIRE", "fire_protection");
+        LEGACY.put("PROTECTION_FALL", "feather_falling");
+        LEGACY.put("PROTECTION_PROJECTILE", "projectile_protection");
+        LEGACY.put("PROTECTION_EXPLOSIONS", "blast_protection");
+        LEGACY.put("OXYGEN", "respiration");
+        LEGACY.put("WATER_WORKER", "aqua_affinity");
+        LEGACY.put("THORNS", "thorns");
+        LEGACY.put("DEPTH_STRIDER", "depth_strider");
+        LEGACY.put("FROST_WALKER", "frost_walker");
+        LEGACY.put("CURSE_OF_BINDING", "binding_curse");
+        LEGACY.put("CURSE_OF_VANISHING", "vanishing_curse");
+        LEGACY.put("ARROW_DAMAGE", "power");
+        LEGACY.put("ARROW_KNOCKBACK", "punch");
+        LEGACY.put("ARROW_FIRE", "flame");
+        LEGACY.put("ARROW_INFINITE", "infinity");
+        LEGACY.put("QUICK_CHARGE", "quick_charge");
+        LEGACY.put("MULTISHOT", "multishot");
+        LEGACY.put("PIERCING", "piercing");
+        LEGACY.put("LURE", "lure");
+        LEGACY.put("LUCK_OF_THE_SEA", "luck_of_the_sea");
+        LEGACY.put("MENDING", "mending");
+    }
+    
+    /**
+     * 把配置中的旧版附魔 ID 转换成现代附魔 key，
+     * 非旧版 ID 原样返回，供 ConfigManager 复用。
+     */
+    public static String legacyToKey(String name) {
+        if (name == null) {
+            return null;
+        }
+        String mapped = LEGACY.get(name.trim().toUpperCase(Locale.ROOT));
+        return mapped != null ? mapped : name;
+    }
+    
     private final RandomEnchantment plugin;
     private final Logger logger;
     private final Random random;
@@ -80,18 +133,21 @@ public class EnchantmentManager {
                 plugin.getConfig().getBoolean("allow-duplicate-enchantments", false));
         
         // 应用选定的附魔
+        int applied = 0;
         for (Enchantment enchantment : selectedEnchantments) {
             // 检查兼容性和有效性
             if (isEnchantmentCompatibleWithItem(enchantment, item)) {
                 int level = getRandomEnchantmentLevel(enchantment);
                 item.addUnsafeEnchantment(enchantment, level); // 使用unsafe避免一些兼容性检查
+                applied++;
                 logDebug("已应用附魔: " + enchantment.getKey() + " 等级: " + level);
             } else {
                 logDebug("跳过不兼容的附魔: " + enchantment.getKey() + " 对于物品: " + item.getType());
             }
         }
         
-        return !selectedEnchantments.isEmpty();
+        // 全部附魔都被兼容性检查跳过时视为失败，避免调用方扣经验并提示成功
+        return applied > 0;
     }
     
     /**
@@ -114,8 +170,10 @@ public class EnchantmentManager {
         else if (materialName.contains("LEGGINGS")) return "leggings";
         else if (materialName.contains("BOOTS")) return "boots";
         // 远程武器
-        else if (materialName.contains("BOW")) return "bow";
+        // 注意：CROSSBOW 必须判断在 BOW 之前，
+        // 否则 "CROSSBOW".contains("BOW") 会命中，crossbow 分支变成死代码
         else if (materialName.contains("CROSSBOW")) return "crossbow";
+        else if (materialName.contains("BOW")) return "bow";
         else if (materialName.contains("TRIDENT")) return "tool"; // 三叉戟作为工具处理
         // 其他
         else if (materialName.contains("FISHING_ROD")) return "fishing_rod";
@@ -161,6 +219,12 @@ public class EnchantmentManager {
      * 通过名称获取附魔
      */
     private Enchantment getEnchantmentByName(String name) {
+        // 先做旧版附魔 ID → 现代 key 的映射
+        String mapped = legacyToKey(name);
+        if (mapped != null) {
+            name = mapped;
+        }
+        
         // 尝试直接通过键获取（转换为小写）
         Enchantment enchantment = Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(name.toLowerCase()));
         if (enchantment != null) {
